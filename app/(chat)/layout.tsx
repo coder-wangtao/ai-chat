@@ -17,6 +17,7 @@ export default async function Layout({
 
   return (
     <>
+      {/* 页面交互之前加载该脚本。 */}
       <Script
         src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"
         strategy="beforeInteractive"

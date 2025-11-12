@@ -37,8 +37,10 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
+    // 测试访问的基础 URL
     baseURL,
 
+    // 在测试失败时保留追踪记录，可用 npx playwright show-trace 查看
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "retain-on-failure",
   },
@@ -51,6 +53,7 @@ export default defineConfig({
 
   /* Configure projects */
   projects: [
+    // e2e 测试：匹配路径 tests/e2e/*.test.ts
     {
       name: "e2e",
       testMatch: /e2e\/.*.test.ts/,
@@ -58,6 +61,7 @@ export default defineConfig({
         ...devices["Desktop Chrome"],
       },
     },
+    // routes 测试：匹配路径 tests/routes/*.test.ts
     {
       name: "routes",
       testMatch: /routes\/.*.test.ts/,

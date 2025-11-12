@@ -168,7 +168,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
     return (
       <SidebarGroup>
         <div className="px-2 py-1 text-sidebar-foreground/50 text-xs">
-          Today
+          今天
         </div>
         <SidebarGroupContent>
           <div className="flex flex-col">

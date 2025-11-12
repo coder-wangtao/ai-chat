@@ -68,7 +68,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                 }}
               >
                 <span className="cursor-pointer rounded-md px-2 font-semibold text-lg hover:bg-muted">
-                  Chatbot
+                  ai助手
                 </span>
               </Link>
               <div className="flex flex-row gap-1">
@@ -85,7 +85,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent align="end" className="hidden md:block">
-                      Delete All Chats
+                      删除所有的聊天记录
                     </TooltipContent>
                   </Tooltip>
                 )}
@@ -105,7 +105,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent align="end" className="hidden md:block">
-                    New Chat
+                    开启新的聊天
                   </TooltipContent>
                 </Tooltip>
               </div>
@@ -121,16 +121,15 @@ export function AppSidebar({ user }: { user: User | undefined }) {
       <AlertDialog onOpenChange={setShowDeleteAllDialog} open={showDeleteAllDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete all chats?</AlertDialogTitle>
+            <AlertDialogTitle>删除所有的聊天记录?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete all your
-              chats and remove them from our servers.
+              此操作无法撤消。这将永久删除您的所有聊天并将其从我们的服务器中删除。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteAll}>
-              Delete All
+              删除全部的聊天记录
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
