@@ -5,15 +5,16 @@ import { z } from "zod";
 import { auth } from "@/app/(auth)/auth";
 
 // Use Blob instead of File since File is not available in Node.js environment
+//TODO:上传到数据库
 const FileSchema = z.object({
   file: z
     .instanceof(Blob)
     .refine((file) => file.size <= 5 * 1024 * 1024, {
-      message: "File size should be less than 5MB",
+      message: "文件大小应该小于5MB",
     })
     // Update the file type based on the kind of files you want to accept
     .refine((file) => ["image/jpeg", "image/png"].includes(file.type), {
-      message: "File type should be JPEG or PNG",
+      message: "文件类型应该是JPEG或者PNG",
     }),
 });
 
@@ -21,11 +22,11 @@ export async function POST(request: Request) {
   const session = await auth();
 
   if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "未授权" }, { status: 401 });
   }
 
   if (request.body === null) {
-    return new Response("Request body is empty", { status: 400 });
+    return new Response("请求体为空", { status: 400 });
   }
 
   try {
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
     const file = formData.get("file") as Blob;
 
     if (!file) {
-      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+      return NextResponse.json({ error: "文件未上传" }, { status: 400 });
     }
 
     const validatedFile = FileSchema.safeParse({ file });

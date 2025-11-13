@@ -10,7 +10,6 @@ import type { VisibilityType } from "./visibility-selector";
 type SuggestedActionsProps = {
   chatId: string;
   sendMessage: UseChatHelpers<ChatMessage>["sendMessage"];
-  selectedVisibilityType: VisibilityType;
 };
 
 function PureSuggestedActions({ chatId, sendMessage }: SuggestedActionsProps) {
@@ -59,10 +58,6 @@ export const SuggestedActions = memo(
     if (prevProps.chatId !== nextProps.chatId) {
       return false;
     }
-    if (prevProps.selectedVisibilityType !== nextProps.selectedVisibilityType) {
-      return false;
-    }
-
     return true;
   }
 );

@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import useSWR, { useSWRConfig } from "swr";
 import { unstable_serialize } from "swr/infinite";
-import { updateChatVisibility } from "@/app/(chat)/actions";
 import {
   type ChatHistory,
   getChatHistoryPaginationKey,
@@ -29,24 +28,11 @@ export function useChatVisibility({
   );
 
   const visibilityType = useMemo(() => {
-    if (!history) {
-      return localVisibility;
-    }
-    const chat = history.chats.find((currentChat) => currentChat.id === chatId);
-    if (!chat) {
-      return "private";
-    }
-    return chat.visibility;
+   
   }, [history, chatId, localVisibility]);
 
   const setVisibilityType = (updatedVisibilityType: VisibilityType) => {
-    setLocalVisibility(updatedVisibilityType);
-    mutate(unstable_serialize(getChatHistoryPaginationKey));
-
-    updateChatVisibility({
-      chatId,
-      visibility: updatedVisibilityType,
-    });
+   
   };
 
   return { visibilityType, setVisibilityType };

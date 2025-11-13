@@ -8,7 +8,6 @@ import { titlePrompt } from "@/lib/ai/prompts";
 import {
   deleteMessagesByChatIdAfterTimestamp,
   getMessageById,
-  updateChatVisibilityById,
 } from "@/lib/db/queries";
 import { getTextFromMessage } from "@/lib/utils";
 
@@ -38,14 +37,4 @@ export async function deleteTrailingMessages({ id }: { id: string }) {
     chatId: message.chatId,
     timestamp: message.createdAt,
   });
-}
-
-export async function updateChatVisibility({
-  chatId,
-  visibility,
-}: {
-  chatId: string;
-  visibility: VisibilityType;
-}) {
-  await updateChatVisibilityById({ chatId, visibility });
 }

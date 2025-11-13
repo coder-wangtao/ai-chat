@@ -15,7 +15,6 @@ import {
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import type { ArtifactKind } from "@/components/artifact";
-import type { VisibilityType } from "@/components/visibility-selector";
 import { ChatSDKError } from "../errors";
 import type { AppUsage } from "../usage";
 import { generateUUID } from "../utils";
@@ -86,12 +85,10 @@ export async function saveChat({
   id,
   userId,
   title,
-  visibility,
 }: {
   id: string;
   userId: string;
   title: string;
-  visibility: VisibilityType;
 }) {
   try {
     return await db.insert(chat).values({
@@ -99,7 +96,6 @@ export async function saveChat({
       createdAt: new Date(),
       userId,
       title,
-      visibility,
     });
   } catch (_error) {
     throw new ChatSDKError("bad_request:database", "Failed to save chat");
@@ -126,7 +122,9 @@ export async function deleteChatById({ id }: { id: string }) {
 }
 
 export async function deleteAllChatsByUserId({ userId }: { userId: string }) {
+  
   try {
+    //select id as chat.id from chat where char.userId = ? 
     const userChats = await db
       .select({ id: chat.id })
       .from(chat)
@@ -137,12 +135,15 @@ export async function deleteAllChatsByUserId({ userId }: { userId: string }) {
     }
 
     const chatIds = userChats.map(c => c.id);
-
+    // delete from vote where vote.chatId in chatIds;
     await db.delete(vote).where(inArray(vote.chatId, chatIds));
+    // delete from message where message.chatId in chatIds;
     await db.delete(message).where(inArray(message.chatId, chatIds));
+    // delete from stream where stream.chatId in chatIds;
     await db.delete(stream).where(inArray(stream.chatId, chatIds));
 
-    const deletedChats = await db
+    //delete from chat where chat.userId = ? return * 
+    const deletedChats = await db 
       .delete(chat)
       .where(eq(chat.userId, userId))
       .returning();
@@ -159,8 +160,8 @@ export async function deleteAllChatsByUserId({ userId }: { userId: string }) {
 export async function getChatsByUserId({
   id,
   limit,
-  startingAfter,
-  endingBefore,
+  startingAfter, // startingAfter → 获取指定聊天之后的聊天
+  endingBefore, // endingBefore → 获取指定聊天之前的聊天
 }: {
   id: string;
   limit: number;
@@ -171,6 +172,20 @@ export async function getChatsByUserId({
     const extendedLimit = limit + 1;
 
     const query = (whereCondition?: SQL<any>) =>
+      //whereCondition = true
+      //select * from chat where chat.userId = ? && chat.createdAt > ? 
+      //order by chat.createdAt desc
+      //limit ?
+
+      //select * from chat where chat.userId = ? && chat.createdAt < ? 
+      //order by chat.createdAt desc
+      //limit ?
+
+      //whereCondition = false
+      //select * from chat where chat.userId = ?  
+      //order by chat.createdAt desc
+      //limit ?
+
       db
         .select()
         .from(chat)
@@ -185,6 +200,10 @@ export async function getChatsByUserId({
     let filteredChats: Chat[] = [];
 
     if (startingAfter) {
+      // select *
+      // from chat
+      // where chat.id = ?
+      // limit 1;
       const [selectedChat] = await db
         .select()
         .from(chat)
@@ -233,7 +252,9 @@ export async function getChatsByUserId({
 }
 
 export async function getChatById({ id }: { id: string }) {
+
   try {
+    //select * from chat where chat.id = ?
     const [selectedChat] = await db.select().from(chat).where(eq(chat.id, id));
     if (!selectedChat) {
       return null;
@@ -278,17 +299,24 @@ export async function voteMessage({
   type: "up" | "down";
 }) {
   try {
+    // select * from vote where vote.messageId = ?
     const [existingVote] = await db
       .select()
       .from(vote)
       .where(and(eq(vote.messageId, messageId)));
 
     if (existingVote) {
+      // update vote
+      // set isUpvoted = true/false
+      // where vote.messageId = ? and chatId = ?;
       return await db
         .update(vote)
         .set({ isUpvoted: type === "up" })
         .where(and(eq(vote.messageId, messageId), eq(vote.chatId, chatId)));
     }
+
+    // insert into vote (chatId, messageId, isUpvoted)
+    // values (?, ?, ?);
     return await db.insert(vote).values({
       chatId,
       messageId,
@@ -301,6 +329,7 @@ export async function voteMessage({
 
 export async function getVotesByChatId({ id }: { id: string }) {
   try {
+    // select * from vote where vote.chatId = ？
     return await db.select().from(vote).where(eq(vote.chatId, id));
   } catch (_error) {
     throw new ChatSDKError(
@@ -324,6 +353,8 @@ export async function saveDocument({
   userId: string;
 }) {
   try {
+    // insert document 
+    // insert into user (id, title, kind, content, userId, createdAt) values (?,?,?,?,?,?);
     return await db
       .insert(document)
       .values({
@@ -341,6 +372,7 @@ export async function saveDocument({
 }
 
 export async function getDocumentsById({ id }: { id: string }) {
+  // select * from document where document.id = ? order by document.createdAt asc
   try {
     const documents = await db
       .select()
@@ -381,6 +413,7 @@ export async function deleteDocumentsByIdAfterTimestamp({
   id: string;
   timestamp: Date;
 }) {
+  //delete from suggestion where suggestion.documentId = ? && suggestion.documentCreatedAt > ?
   try {
     await db
       .delete(suggestion)
@@ -390,7 +423,7 @@ export async function deleteDocumentsByIdAfterTimestamp({
           gt(suggestion.documentCreatedAt, timestamp)
         )
       );
-
+    // delete from document where document.id = ? && document.createdAt > ? return * 
     return await db
       .delete(document)
       .where(and(eq(document.id, id), gt(document.createdAt, timestamp)))
@@ -424,6 +457,7 @@ export async function getSuggestionsByDocumentId({
   documentId: string;
 }) {
   try {
+    //select * from suggestion where suggestion.documentId = ?
     return await db
       .select()
       .from(suggestion)
@@ -487,22 +521,7 @@ export async function deleteMessagesByChatIdAfterTimestamp({
   }
 }
 
-export async function updateChatVisibilityById({
-  chatId,
-  visibility,
-}: {
-  chatId: string;
-  visibility: "private" | "public";
-}) {
-  try {
-    return await db.update(chat).set({ visibility }).where(eq(chat.id, chatId));
-  } catch (_error) {
-    throw new ChatSDKError(
-      "bad_request:database",
-      "Failed to update chat visibility by id"
-    );
-  }
-}
+
 
 export async function updateChatLastContextById({
   chatId,
