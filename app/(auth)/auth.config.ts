@@ -2,6 +2,8 @@ import type { NextAuthConfig } from "next-auth";
 
 export const authConfig = {
   pages: {
+    // signIn: "/login" → 登录页地址
+    // newUser: "/" → 新用户注册成功后跳转页面
     signIn: "/login",
     newUser: "/",
   },

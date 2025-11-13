@@ -7,6 +7,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const redirectUrl = searchParams.get("redirectUrl") || "/";
 
+  // 判断用户是否已经登录。
   const token = await getToken({
     req: request,
     secret: process.env.AUTH_SECRET,
@@ -16,6 +17,6 @@ export async function GET(request: Request) {
   if (token) {
     return NextResponse.redirect(new URL("/", request.url));
   }
-
+  
   return signIn("guest", { redirect: true, redirectTo: redirectUrl });
 }

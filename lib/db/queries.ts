@@ -44,7 +44,8 @@ const db = drizzle(client);
 
 export async function getUser(email: string): Promise<User[]> {
   try {
-    return await db.select().from(user).where(eq(user.email, email));
+    // select * from user where user.email = ?
+    return await db.select().from(user).where(eq(user.email,email))
   } catch (_error) {
     throw new ChatSDKError(
       "bad_request:database",
@@ -57,6 +58,7 @@ export async function createUser(email: string, password: string) {
   const hashedPassword = generateHashedPassword(password);
 
   try {
+    // insert into user (email, password) values (?, ?);
     return await db.insert(user).values({ email, password: hashedPassword });
   } catch (_error) {
     throw new ChatSDKError("bad_request:database", "Failed to create user");
@@ -66,7 +68,7 @@ export async function createUser(email: string, password: string) {
 export async function createGuestUser() {
   const email = `guest-${Date.now()}`;
   const password = generateHashedPassword(generateUUID());
-
+  // inset into "user" (email, password) values (?,?) returning id, email;
   try {
     return await db.insert(user).values({ email, password }).returning({
       id: user.id,
