@@ -69,6 +69,9 @@ const getTokenlensCatalog = cache(
 export function getStreamContext() {
   if (!globalStreamContext) {
     try {
+      // createResumableStreamContext 就是用来生成一个管理“可恢复流状态”的对象，让你在上传/下载大文件或长时间数据流时，
+      // 能够安全地分块传输，并在中断后从中断位置继续，而不需要重新传输全部数据。
+      // 创建一个可恢复流上下文
       globalStreamContext = createResumableStreamContext({
         waitUntil: after,
       });
@@ -128,12 +131,14 @@ export async function POST(request: Request) {
     let messagesFromDb: DBMessage[] = [];
 
     if (chat) {
+      // 多次聊天的情况
       if (chat.userId !== session.user.id) {
         return new ChatSDKError("forbidden:chat").toResponse();
       }
       // Only fetch messages if chat already exists
       messagesFromDb = await getMessagesByChatId({ id });
     } else {
+      // 第一次聊天
       const title = await generateTitleFromUserMessage({
         message,
       });
@@ -178,11 +183,13 @@ export async function POST(request: Request) {
     const stream = createUIMessageStream({
       execute: ({ writer: dataStream }) => {
         const result = streamText({
-          model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel, requestHints }),
-          messages: convertToModelMessages(uiMessages),
-          stopWhen: stepCountIs(5),
+          model: myProvider.languageModel(selectedChatModel), // 模型
+          system: systemPrompt({ selectedChatModel, requestHints }), // 系统提示词
+          messages: convertToModelMessages(uiMessages), // 消息
+          stopWhen: stepCountIs(5), // 控制工具调用循环何时停止
           experimental_activeTools:
+            // 如果是 chat-model-reasoning，则不使用额外工具。
+            // 否则可以调用天气、文档创建/更新、建议等工具。
             selectedChatModel === "chat-model-reasoning"
               ? []
               : [
@@ -191,6 +198,11 @@ export async function POST(request: Request) {
                   "updateDocument",
                   "requestSuggestions",
                 ],
+          // 允许你对模型生成的文本流进行 实时处理或转换。      
+          // 它会把流式生成的文本 “平滑”输出，让前端显示更加自然，不会一次性输出一大段文字。
+          // king: "word" 
+          // 前端可以 逐词显示，用户看到的效果更像真人打字。
+          // 有助于处理长文本，减少卡顿。
           experimental_transform: smoothStream({ chunking: "word" }),
           tools: {
             getWeather,
@@ -203,9 +215,13 @@ export async function POST(request: Request) {
           },
           experimental_telemetry: {
             isEnabled: isProductionEnvironment,
-            functionId: "stream-text",
+            functionId: "stream-text", // 标识这个遥测数据属于 哪个功能或接口。这里 "stream-text" 表示这是 流式文本生成 功能的统计数据。
           },
           onFinish: async ({ usage }) => {
+            // 尝试使用 TokenLens 提供商 增强模型使用情况统计。
+            // 如果成功，发送增强后的统计到前端。
+            // 如果失败，仍然发送 基础使用情况。
+            // 保证前端总是能收到 data-usage 信息。
             try {
               const providers = await getTokenlensCatalog();
               const modelId =
@@ -238,15 +254,17 @@ export async function POST(request: Request) {
             }
           },
         });
-
+        //1.启动模型文本流的生成 (consumeStream)。
         result.consumeStream();
 
+        //3.实时合并到前端显示 (dataStream.merge)，支持显示模型的推理过程。
         dataStream.merge(
+          // 2.将生成的文本转换成前端消息流 (toUIMessageStream)。
           result.toUIMessageStream({
             sendReasoning: true,
           })
         );
-      },
+      },  
       generateId: generateUUID,
       onFinish: async ({ messages }) => {
         await saveMessages({

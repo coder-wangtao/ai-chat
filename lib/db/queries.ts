@@ -67,7 +67,7 @@ export async function createUser(email: string, password: string) {
 export async function createGuestUser() {
   const email = `guest-${Date.now()}`;
   const password = generateHashedPassword(generateUUID());
-  // inset into "user" (email, password) values (?,?) returning id, email;
+  // inset into user (email, password) values (?,?) returning id, email;
   try {
     return await db.insert(user).values({ email, password }).returning({
       id: user.id,
@@ -91,6 +91,8 @@ export async function saveChat({
   title: string;
 }) {
   try {
+    // insert into vote (id, createdAt, userId, title)
+    // values (?, new Date(), ?, ?);
     return await db.insert(chat).values({
       id,
       createdAt: new Date(),
@@ -104,10 +106,14 @@ export async function saveChat({
 
 export async function deleteChatById({ id }: { id: string }) {
   try {
+    // delete from vote where vo.chatId = ? 
     await db.delete(vote).where(eq(vote.chatId, id));
+    // delete from message where message.chatId = ? 
     await db.delete(message).where(eq(message.chatId, id));
+    // delete from stream where stream.chatId = ? 
     await db.delete(stream).where(eq(stream.chatId, id));
 
+    // delete from chat where chat.id = ? return *
     const [chatsDeleted] = await db
       .delete(chat)
       .where(eq(chat.id, id))
@@ -268,6 +274,8 @@ export async function getChatById({ id }: { id: string }) {
 
 export async function saveMessages({ messages }: { messages: DBMessage[] }) {
   try {
+    // insert into message (id, createdAt, chatId, role, parts, attachments)
+    // values (?. ?, ?, ?, ?, ?);
     return await db.insert(message).values(messages);
   } catch (_error) {
     throw new ChatSDKError("bad_request:database", "Failed to save messages");
@@ -275,6 +283,7 @@ export async function saveMessages({ messages }: { messages: DBMessage[] }) {
 }
 
 export async function getMessagesByChatId({ id }: { id: string }) {
+  // select * from message where message.chatId = id order by message.createdAt asc
   try {
     return await db
       .select()
@@ -532,6 +541,8 @@ export async function updateChatLastContextById({
   context: AppUsage;
 }) {
   try {
+    // update chat set chat.lastContext = ? where chat.id = ?
+    // lastContext 就是模型用量统计
     return await db
       .update(chat)
       .set({ lastContext: context })
@@ -550,9 +561,13 @@ export async function getMessageCountByUserId({
   differenceInHours: number;
 }) {
   try {
+    // 只查24小时之前到现在的数量
     const twentyFourHoursAgo = new Date(
       Date.now() - differenceInHours * 60 * 60 * 1000
     );
+    // select count(message.id) as count from message
+    // inner join chat on message.chatId = chat.id
+    // where chat.userId = ? and message.createAt >= ? and message.role = ?
 
     const [stats] = await db
       .select({ count: count(message.id) })
@@ -566,6 +581,8 @@ export async function getMessageCountByUserId({
         )
       )
       .execute();
+
+
 
     return stats?.count ?? 0;
   } catch (_error) {
@@ -584,6 +601,7 @@ export async function createStreamId({
   chatId: string;
 }) {
   try {
+    //inset into stream (id, chatId,createdAt) values (?,?,?) 
     await db
       .insert(stream)
       .values({ id: streamId, chatId, createdAt: new Date() });
@@ -596,7 +614,8 @@ export async function createStreamId({
 }
 
 export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
-  try {
+  // select stream.id as id where stream.chatId = ? orderby stream.createdAt asc = ? 
+   try {
     const streamIds = await db
       .select({ id: stream.id })
       .from(stream)

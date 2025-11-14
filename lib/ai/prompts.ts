@@ -33,7 +33,7 @@ Do not update document right after creating it. Wait for user feedback or reques
 `;
 
 export const regularPrompt =
-  "You are a friendly assistant! Keep your responses concise and helpful.";
+  "你是个友好的助手！保持你的回答简洁明了。";
 
 export type RequestHints = {
   latitude: Geo["latitude"];
@@ -43,11 +43,11 @@ export type RequestHints = {
 };
 
 export const getRequestPromptFromHints = (requestHints: RequestHints) => `\
-About the origin of user's request:
-- lat: ${requestHints.latitude}
-- lon: ${requestHints.longitude}
-- city: ${requestHints.city}
-- country: ${requestHints.country}
+关于用户请求的来源：
+- 纬度: ${requestHints.latitude}
+- 经度: ${requestHints.longitude}
+- 城市: ${requestHints.city}
+- 国家: ${requestHints.country}
 `;
 
 export const systemPrompt = ({
@@ -114,7 +114,7 @@ ${currentContent}`;
 };
 
 export const titlePrompt = `\n
-    - you will generate a short title based on the first message a user begins a conversation with
-    - ensure it is not more than 80 characters long
-    - the title should be a summary of the user's message
-    - do not use quotes or colons`
+    - 您将根据用户开始对话的第一条消息生成一个简短的标题
+    - 确保其长度不超过80个字符
+    - 标题应该是用户消息的摘要
+    - 不要使用引号或冒号`

@@ -61,18 +61,18 @@ export function Chat({
   }, [currentModelId]);
 
   const {
-    messages,
-    setMessages,
-    sendMessage,
-    status,
-    stop,
-    regenerate,
-    resumeStream,
+    messages, // 当前聊天的消息列表 
+    setMessages, // 更新消息列表的函数
+    sendMessage, // 发送新消息
+    status, // 聊天状态（idle / loading / streaming 等）
+    stop, // 停止当前流式生成
+    regenerate, // 重新生成上一条消息
+    resumeStream, // 恢复之前未完成的聊天流
   } = useChat<ChatMessage>({
-    id,
-    messages: initialMessages,
-    experimental_throttle: 100,
-    generateId: generateUUID,
+    id, // 聊天 ID，用于识别当前会话
+    messages: initialMessages, // 初始消息列表
+    experimental_throttle: 100, // 节流参数，每 100ms 批量处理数据
+    generateId: generateUUID, // 为每条新消息生成唯一 ID
     transport: new DefaultChatTransport({
       api: "/api/chat",
       fetch: fetchWithErrorHandlers,
@@ -80,20 +80,25 @@ export function Chat({
         return {
           body: {
             id: request.id,
-            message: request.messages.at(-1),
-            selectedChatModel: currentModelIdRef.current,
+            message: request.messages.at(-1), // 最后一条消息 (request.messages.at(-1))
+            selectedChatModel: currentModelIdRef.current, // 模型
             ...request.body,
           },
         };
       },
     }),
     onData: (dataPart) => {
+      // 每当收到后端流式数据时触发
+      // 更新前端 数据流状态 (setDataStream)
       setDataStream((ds) => (ds ? [...ds, dataPart] : []));
       if (dataPart.type === "data-usage") {
+        // 如果是使用统计，更新 usage 状态
         setUsage(dataPart.data);
       }
     },
     onFinish: () => {
+      // 当流生成完成时触发
+      // 目的是让 聊天历史在 UI 中更新
       mutate(unstable_serialize(getChatHistoryPaginationKey));
     },
     onError: (error) => {

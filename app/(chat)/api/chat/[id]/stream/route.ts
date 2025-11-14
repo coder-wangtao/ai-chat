@@ -59,6 +59,10 @@ export async function GET(
     return new ChatSDKError("not_found:stream").toResponse();
   }
 
+  // 创建一个空消息流，保证前端始终能接收流（即使没有数据）。
+  // 尝试恢复上一次的聊天流：
+  // 成功 → 返回实际流。
+  // 失败 → 返回空流（fallback）。
   const emptyDataStream = createUIMessageStream<ChatMessage>({
     // biome-ignore lint/suspicious/noEmptyBlockStatements: "Needs to exist"
     execute: () => {},
@@ -86,10 +90,12 @@ export async function GET(
 
     const messageCreatedAt = new Date(mostRecentMessage.createdAt);
 
+    //超过 15 秒 → 返回空流。
     if (differenceInSeconds(resumeRequestedAt, messageCreatedAt) > 15) {
       return new Response(emptyDataStream, { status: 200 });
     }
 
+    //创建一个 临时流，将最近消息发送给前端（transient: true 表示临时显示，不会持久化）
     const restoredStream = createUIMessageStream<ChatMessage>({
       execute: ({ writer }) => {
         writer.write({
