@@ -16,7 +16,7 @@ type CreateDocumentProps = {
 export const createDocument = ({ session, dataStream }: CreateDocumentProps) =>
   tool({
     description:
-      "Create a document for a writing or content creation activities. This tool will call other functions that will generate the contents of the document based on the title and kind.",
+      "创建一个用于写作或内容创作活动的文档。该工具将调用其他函数，根据标题和类型生成文档内容。",
     inputSchema: z.object({
       title: z.string(),
       kind: z.enum(artifactKinds),
@@ -54,7 +54,7 @@ export const createDocument = ({ session, dataStream }: CreateDocumentProps) =>
       );
 
       if (!documentHandler) {
-        throw new Error(`No document handler found for kind: ${kind}`);
+        throw new Error(`未找到适用于此类型的文档处理器：${kind}`);
       }
 
       await documentHandler.onCreateDocument({
@@ -70,7 +70,7 @@ export const createDocument = ({ session, dataStream }: CreateDocumentProps) =>
         id,
         title,
         kind,
-        content: "A document was created and is now visible to the user.",
+        content: "文档已创建，现在用户可以看到它。",
       };
     },
   });

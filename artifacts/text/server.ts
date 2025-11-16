@@ -11,7 +11,7 @@ export const textDocumentHandler = createDocumentHandler<"text">({
     const { fullStream } = streamText({
       model: myProvider.languageModel("artifact-model"),
       system:
-        "Write about the given topic. Markdown is supported. Use headings wherever appropriate.",
+        "撰写关于给定主题的内容。支持 Markdown。适当使用标题。",
       experimental_transform: smoothStream({ chunking: "word" }),
       prompt: title,
     });
@@ -43,7 +43,7 @@ export const textDocumentHandler = createDocumentHandler<"text">({
       experimental_transform: smoothStream({ chunking: "word" }),
       prompt: description,
       providerOptions: {
-        openai: {
+        deepseek: {
           prediction: {
             type: "content",
             content: document.content,

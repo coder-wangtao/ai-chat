@@ -1,7 +1,9 @@
 "use client";
-
+// exampleSetup：加载 ProseMirror 的常用插件（undo/redo、快捷键等）
 import { exampleSetup } from "prosemirror-example-setup";
+// inputRules：定义输入规则，比如输入 # 自动变标题
 import { inputRules } from "prosemirror-inputrules";
+// EditorState / EditorView：ProseMirror 核心概念（文档状态 + 编辑器实例）
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { memo, useEffect, useRef } from "react";
@@ -44,9 +46,11 @@ function PureEditor({
   useEffect(() => {
     if (containerRef.current && !editorRef.current) {
       const state = EditorState.create({
+        // 将外部传入的 content（字符串）转成 ProseMirror 文档对象。
         doc: buildDocumentFromContent(content),
         plugins: [
           ...exampleSetup({ schema: documentSchema, menuBar: false }),
+          // 定义输入规则（自动格式化），这里是 标题规则：
           inputRules({
             rules: [
               headingRule(1),

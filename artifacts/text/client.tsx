@@ -147,14 +147,14 @@ export const textArtifact = new Artifact<"text", TextArtifactMetadata>({
   toolbar: [
     {
       icon: <PenIcon />,
-      description: "Add final polish",
+      description: "最后润色",
       onClick: ({ sendMessage }) => {
         sendMessage({
           role: "user",
           parts: [
             {
               type: "text",
-              text: "Please add final polish and check for grammar, add section titles for better structure, and ensure everything reads smoothly.",
+              text: "请进行最后的润色并检查语法，为更好的结构添加章节标题，并确保内容阅读流畅。",
             },
           ],
         });
@@ -162,14 +162,14 @@ export const textArtifact = new Artifact<"text", TextArtifactMetadata>({
     },
     {
       icon: <MessageIcon />,
-      description: "Request suggestions",
+      description: "请求建议",
       onClick: ({ sendMessage }) => {
         sendMessage({
           role: "user",
           parts: [
             {
               type: "text",
-              text: "Please add suggestions you have that could improve the writing.",
+              text: "请提出您认为可以改进写作的建议。",
             },
           ],
         });

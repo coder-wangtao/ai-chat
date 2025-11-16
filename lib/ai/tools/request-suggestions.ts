@@ -17,18 +17,18 @@ export const requestSuggestions = ({
   dataStream,
 }: RequestSuggestionsProps) =>
   tool({
-    description: "Request suggestions for a document",
+    description: "请求文档的建议",
     inputSchema: z.object({
       documentId: z
         .string()
-        .describe("The ID of the document to request edits"),
+        .describe("请求编辑的文档ID"),
     }),
     execute: async ({ documentId }) => {
       const document = await getDocumentById({ id: documentId });
 
       if (!document || !document.content) {
         return {
-          error: "Document not found",
+          error: "文档没有找到！",
         };
       }
 
@@ -40,16 +40,16 @@ export const requestSuggestions = ({
       const { elementStream } = streamObject({
         model: myProvider.languageModel("artifact-model"),
         system:
-          "You are a help writing assistant. Given a piece of writing, please offer suggestions to improve the piece of writing and describe the change. It is very important for the edits to contain full sentences instead of just words. Max 5 suggestions.",
+          "你是一个写作辅助助手。给定一篇文章，请提供改进文章的建议并描述具体的修改。修改时非常重要的一点是，修改内容应包含完整的句子，而不仅仅是单个词汇。最多提供五条建议。",
         prompt: document.content,
         output: "array",
         schema: z.object({
-          originalSentence: z.string().describe("The original sentence"),
-          suggestedSentence: z.string().describe("The suggested sentence"),
-          description: z.string().describe("The description of the suggestion"),
+          originalSentence: z.string().describe("原句"),
+          suggestedSentence: z.string().describe("建议的句子"),
+          description: z.string().describe("建议的描述"),
         }),
       });
-
+      console.log('--------------',elementStream)
       for await (const element of elementStream) {
         // @ts-expect-error todo: fix type
         const suggestion: Suggestion = {
@@ -87,7 +87,7 @@ export const requestSuggestions = ({
         id: documentId,
         title: document.title,
         kind: document.kind,
-        message: "Suggestions have been added to the document",
+        message: "建议已添加到文档中",
       };
     },
   });

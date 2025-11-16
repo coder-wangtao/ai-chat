@@ -10,13 +10,13 @@ const getActionText = (
 ) => {
   switch (type) {
     case "create":
-      return tense === "present" ? "Creating" : "Created";
+      return tense === "present" ? "创建中" : "已创建";
     case "update":
-      return tense === "present" ? "Updating" : "Updated";
+      return tense === "present" ? "更新中" : "更新完成";
     case "request-suggestions":
       return tense === "present"
-        ? "Adding suggestions"
-        : "Added suggestions to";
+        ? "添加建议中"
+        : "已添加建议到";
     default:
       return null;
   }

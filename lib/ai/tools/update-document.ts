@@ -12,19 +12,19 @@ type UpdateDocumentProps = {
 
 export const updateDocument = ({ session, dataStream }: UpdateDocumentProps) =>
   tool({
-    description: "Update a document with the given description.",
+    description: "根据给定的描述更新文档。",
     inputSchema: z.object({
-      id: z.string().describe("The ID of the document to update"),
+      id: z.string().describe("要更新的文档ID"),
       description: z
         .string()
-        .describe("The description of changes that need to be made"),
+        .describe("需要进行更改的描述"),
     }),
     execute: async ({ id, description }) => {
       const document = await getDocumentById({ id });
 
       if (!document) {
         return {
-          error: "Document not found",
+          error: "未找到文档",
         };
       }
 
@@ -40,7 +40,7 @@ export const updateDocument = ({ session, dataStream }: UpdateDocumentProps) =>
       );
 
       if (!documentHandler) {
-        throw new Error(`No document handler found for kind: ${document.kind}`);
+        throw new Error(`未找到适用于此类型的文档处理器： ${document.kind}`);
       }
 
       await documentHandler.onUpdateDocument({
@@ -56,7 +56,7 @@ export const updateDocument = ({ session, dataStream }: UpdateDocumentProps) =>
         id,
         title: document.title,
         kind: document.kind,
-        content: "The document has been updated successfully.",
+        content: "文档已成功更新。",
       };
     },
   });
