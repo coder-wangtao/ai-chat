@@ -37,7 +37,7 @@ export const Suggestion = ({
           <div className="flex flex-row items-center justify-between">
             <div className="flex flex-row items-center gap-2">
               <div className="size-4 rounded-full bg-muted-foreground/25" />
-              <div className="font-medium">Assistant</div>
+              <div className="font-medium">AI给出的建议</div>
             </div>
             <button
               className="cursor-pointer text-gray-500 text-xs"
@@ -55,7 +55,7 @@ export const Suggestion = ({
             onClick={onApply}
             variant="outline"
           >
-            Apply
+            应用
           </Button>
         </motion.div>
       ) : (

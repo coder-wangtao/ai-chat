@@ -168,7 +168,7 @@ const PurePreviewMessage = ({
             if (type === "tool-getWeather") {
               const { toolCallId, state } = part;
 
-              return (
+              return ( 
                 <Tool defaultOpen={true} key={toolCallId}>
                   <ToolHeader state={state} type="tool-getWeather" />
                   <ToolContent>

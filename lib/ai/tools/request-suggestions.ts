@@ -31,39 +31,43 @@ export const requestSuggestions = ({
           error: "文档没有找到！",
         };
       }
-
+      
       const suggestions: Omit<
         Suggestion,
         "userId" | "createdAt" | "documentCreatedAt"
       >[] = [];
 
-      const { elementStream } = streamObject({
+      const result = streamObject({
         model: myProvider.languageModel("artifact-model"),
         system:
-          "你是一个写作辅助助手。给定一篇文章，请提供改进文章的建议并描述具体的修改。修改时非常重要的一点是，修改内容应包含完整的句子，而不仅仅是单个词汇。最多提供五条建议。",
+           `你是一个写作辅助助手。给定一篇文章，请提供改进文章的建议并描述具体的修改。
+            修改时非常重要的一点是，修改内容应包含完整的句子，而不仅仅是单个词汇。
+            最多提供五条建议。请用 JSON 格式回答：{\"originalSentence\":..., \"suggestedSentence\":..., \"description\":...}，
+            其中originalSentence是原句，suggestedSentence是建议修改后的句子，description是针对原句建议的描述`,
         prompt: document.content,
-        output: "array",
         schema: z.object({
           originalSentence: z.string().describe("原句"),
           suggestedSentence: z.string().describe("建议的句子"),
           description: z.string().describe("建议的描述"),
         }),
       });
-      console.log('--------------',elementStream)
-      for await (const element of elementStream) {
-        // @ts-expect-error todo: fix type
-        const suggestion: Suggestion = {
-          originalText: element.originalSentence,
-          suggestedText: element.suggestedSentence,
-          description: element.description,
-          id: generateUUID(),
-          documentId,
-          isResolved: false,
-        };
+      let allStreamRes = [] as any;
+      for await (const chunk of result.partialObjectStream) {
+        allStreamRes = chunk
+      }
+      for (const item of allStreamRes) {
+        const suggestion = {
+            originalText: item.originalSentence || '',
+            suggestedText: item.suggestedSentence || '',
+            description: item.description || '',
+            id: generateUUID(),
+            documentId,
+            isResolved: false,
+          };
 
         dataStream.write({
           type: "data-suggestion",
-          data: suggestion,
+          data: suggestion as any,
           transient: true,
         });
 

@@ -242,7 +242,7 @@ const DocumentHeader = memo(PureDocumentHeader, (prevProps, nextProps) => {
     return false;
   }
 
-  return true;
+  return false;
 });
 
 const DocumentContent = ({ document }: { document: Document }) => {
