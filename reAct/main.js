@@ -17,6 +17,7 @@ const PROMPT = `
 
 const result = streamText({
   model: model,
+  //ReAct提示词
   system: `
     需要解决一个问题。
     为此，你需要将问题分解为多个步骤。
