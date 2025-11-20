@@ -27,7 +27,6 @@ import { MultimodalInput } from "./multimodal-input";
 import { Toolbar } from "./toolbar";
 import { useSidebar } from "./ui/sidebar";
 import { VersionFooter } from "./version-footer";
-import type { VisibilityType } from "./visibility-selector";
 
 export const artifactDefinitions = [
   textArtifact,
@@ -424,7 +423,7 @@ function PureArtifact({
 
                   {isContentDirty ? (
                     <div className="text-muted-foreground text-sm">
-                      Saving changes...
+                      保存改变...
                     </div>
                   ) : document ? (
                     <div className="text-muted-foreground text-sm">
@@ -441,7 +440,7 @@ function PureArtifact({
                   )}
                 </div>
               </div>
-
+              {/* 右侧操作按钮 */}
               <ArtifactActions
                 artifact={artifact}
                 currentVersionIndex={currentVersionIndex}

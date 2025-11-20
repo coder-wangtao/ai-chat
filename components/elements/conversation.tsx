@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 export type ConversationProps = ComponentProps<typeof StickToBottom>;
 
-export const Conversation = ({ className, ...props }: ConversationProps) => (
+export const Conversation = ({ className, children, ...props }: ConversationProps) => (
   <StickToBottom
     className={cn(
       "relative flex-1 touch-pan-y overflow-y-auto will-change-scroll",
@@ -19,7 +19,7 @@ export const Conversation = ({ className, ...props }: ConversationProps) => (
     resize="smooth"
     role="log"
     {...props}
-  />
+  >{children}</StickToBottom>
 );
 
 export type ConversationContentProps = ComponentProps<
@@ -28,9 +28,10 @@ export type ConversationContentProps = ComponentProps<
 
 export const ConversationContent = ({
   className,
+  children,
   ...props
 }: ConversationContentProps) => (
-  <StickToBottom.Content className={cn("p-4", className)} {...props} />
+  <StickToBottom.Content className={cn("p-4", className)} {...props} >{children}</StickToBottom.Content>
 );
 
 export type ConversationScrollButtonProps = ComponentProps<typeof Button>;

@@ -103,7 +103,7 @@ export function DocumentPreview({
 
   return (
     <div className="relative w-full cursor-pointer">
-      {/* TODO: 左边expand按钮 */}
+      {/* TODO: 右边expand按钮 */}
       <HitboxLayer
         hitboxRef={hitboxRef}
         result={result}
@@ -159,7 +159,6 @@ const PureHitboxLayer = ({
   const handleClick = useCallback(
     (event: MouseEvent<HTMLElement>) => {
       const boundingBox = event.currentTarget.getBoundingClientRect();
-
       setArtifact((artifact) =>
         artifact.status === "streaming"
           ? { ...artifact, isVisible: true }

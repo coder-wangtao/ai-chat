@@ -49,6 +49,7 @@ function PureMessages({
     if (status === "submitted") {
       requestAnimationFrame(() => {
         const container = messagesContainerRef.current;
+        // 从当前位置平滑地滚动到底部
         if (container) {
           container.scrollTo({
             top: container.scrollHeight,
@@ -95,6 +96,7 @@ function PureMessages({
             {status === "submitted" && <ThinkingMessage key="thinking" />}
           </AnimatePresence>
 
+          {/* 消息最后的空白div */}
           <div
             className="min-h-[24px] min-w-[24px] shrink-0"
             ref={messagesEndRef}
@@ -102,6 +104,7 @@ function PureMessages({
         </ConversationContent>
       </Conversation>
 
+      {/* 底部向下查按钮 */}
       {!isAtBottom && (
         <button
           aria-label="Scroll to bottom"

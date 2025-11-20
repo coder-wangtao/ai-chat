@@ -1,4 +1,5 @@
 "use client";
+//TODO:OK
 
 import { useCallback, useMemo } from "react";
 import useSWR from "swr";
@@ -22,9 +23,13 @@ export const initialArtifactData: UIArtifact = {
 type Selector<T> = (state: UIArtifact) => T;
 
 export function useArtifactSelector<Selected>(selector: Selector<Selected>) {
-  const { data: localArtifact } = useSWR<UIArtifact>("artifact", null, {
-    fallbackData: initialArtifactData,
-  });
+  const { data: localArtifact } = useSWR<UIArtifact>(
+    "artifact", //useSWR 的 key，表示你请求的资源的唯一标识符。useSWR 会根据这个 key 来缓存和管理请求的数据。
+    null,  // 作为 fetcher 传递给 useSWR，表示没有指定自定义的数据获取函数，默认是直接使用
+    {
+      fallbackData: initialArtifactData,  // 用于指定初始的默认数据，当请求未完成时，返回这个数据。
+    }
+  );
 
   const selectedValue = useMemo(() => {
     if (!localArtifact) {
@@ -37,7 +42,10 @@ export function useArtifactSelector<Selected>(selector: Selector<Selected>) {
 }
 
 export function useArtifact() {
-  const { data: localArtifact, mutate: setLocalArtifact } = useSWR<UIArtifact>(
+  const { 
+    data: localArtifact,
+    mutate: setLocalArtifact  // 手动更新缓存中的数据（并触发组件重新渲染）
+  } = useSWR<UIArtifact>(
     "artifact",
     null,
     {

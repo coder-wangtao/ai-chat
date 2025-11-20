@@ -89,6 +89,7 @@ const PurePreviewMessage = ({
           })}
         >
           {attachmentsFromMessage.length > 0 && (
+            // 文件相关
             <div
               className="flex flex-row justify-end gap-2"
               data-testid={"message-attachments"}
@@ -112,6 +113,7 @@ const PurePreviewMessage = ({
 
             if (type === "reasoning" && part.text?.trim().length > 0) {
               return (
+                // 思考展示
                 <MessageReasoning
                   isLoading={isLoading}
                   key={key}
@@ -195,7 +197,7 @@ const PurePreviewMessage = ({
                     className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-500 dark:bg-red-950/50"
                     key={toolCallId}
                   >
-                    Error creating document: {String(part.output.error)}
+                    创建文档错误: {String(part.output.error)}
                   </div>
                 );
               }

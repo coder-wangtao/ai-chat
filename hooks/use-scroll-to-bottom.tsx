@@ -17,7 +17,7 @@ export function useScrollToBottom() {
     }
     const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
 
-    // Check if we are within 100px of the bottom (like v0 does)
+    // 检查我们是否在底部100px以内
     setIsAtBottom(scrollTop + clientHeight >= scrollHeight - 100);
   }, []);
 
@@ -27,13 +27,13 @@ export function useScrollToBottom() {
     }
 
     const container = containerRef.current;
-
+    // 用于监听容器的尺寸变化，每次尺寸变化时执行 handleScroll。
     const resizeObserver = new ResizeObserver(() => {
       requestAnimationFrame(() => {
         handleScroll();
       });
     });
-
+    // 用于监听容器内容的变化（如子节点、属性变化等）。
     const mutationObserver = new MutationObserver(() => {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {

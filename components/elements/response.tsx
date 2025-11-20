@@ -1,6 +1,7 @@
 "use client";
 
 import { type ComponentProps, memo } from "react";
+// Markdown 渲染设计的 React 组件/库
 import { Streamdown } from "streamdown";
 import { cn } from "@/lib/utils";
 

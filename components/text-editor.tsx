@@ -1,4 +1,6 @@
 "use client";
+
+// 基于 ProseMirror 的富文本编辑器 React 组件
 // exampleSetup：加载 ProseMirror 的常用插件（undo/redo、快捷键等）
 import { exampleSetup } from "prosemirror-example-setup";
 // inputRules：定义输入规则，比如输入 # 自动变标题
@@ -40,13 +42,13 @@ function PureEditor({
   suggestions,
   status,
 }: EditorProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const editorRef = useRef<EditorView | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null); // 编辑器挂载的 DOM 容器
+  const editorRef = useRef<EditorView | null>(null); // 存储 ProseMirror EditorView 实例
 
   useEffect(() => {
     if (containerRef.current && !editorRef.current) {
       const state = EditorState.create({
-        // 将外部传入的 content（字符串）转成 ProseMirror 文档对象。
+        // 将 content 转换成 ProseMirror 文档对象
         doc: buildDocumentFromContent(content),
         plugins: [
           ...exampleSetup({ schema: documentSchema, menuBar: false }),
@@ -100,6 +102,7 @@ function PureEditor({
         editorRef.current.state.doc
       );
 
+      // 如果 status === "streaming"，说明内容是流式更新，不保存
       if (status === "streaming") {
         const newDocument = buildDocumentFromContent(content);
 
@@ -114,6 +117,7 @@ function PureEditor({
         return;
       }
 
+      // 否则比较当前编辑器内容和外部 content，不同则替换文档
       if (currentContent !== content) {
         const newDocument = buildDocumentFromContent(content);
 
@@ -131,6 +135,7 @@ function PureEditor({
 
   useEffect(() => {
     if (editorRef.current?.state.doc && content) {
+      // 将 suggestions 投射到文档中
       const projectedSuggestions = projectWithPositions(
         editorRef.current.state.doc,
         suggestions
