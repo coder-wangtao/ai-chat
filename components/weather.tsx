@@ -113,11 +113,11 @@ export function Weather({
           <div className="text-right flex flex-col">
             <div className="text-white/70 text-sm flex justify-between">
             <span>最高温度：</span>
-            <span>{weatherAtLocation?.tem1}</span>
+            <span>{weatherAtLocation?.tem1}°C</span>
             </div>
-            <div className="text-white/70 text-sm">
+            <div className="text-white/70 text-sm flex justify-between">
              <span>最低温度：</span>
-            <span>{weatherAtLocation?.tem2}</span>
+            <span>{weatherAtLocation?.tem2}°C</span>
             </div>
           </div>
         </div>
